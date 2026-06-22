@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MIXSCAN — Detector </title>
+  <meta name="description" content="Interfaz gráfica para detección de drones mediante análisis de señales RF con PlutoSDR">
+  <link rel="stylesheet" href="styles.css?v=8">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- BOOT SCREEN -->
+  <div id="boot-screen" class="boot-screen">
+    <div class="boot-logo-wrap">
+      <img src="logo.jpg" class="boot-logo-img" alt="MIXSCAN">
+      <div class="boot-logo-title">MIXSCAN</div>
+      <div class="boot-logo-sub">PlutoSDR · 433.5 MHz</div>
+      <div class="boot-scan-line"></div>
+    </div>
+    <div class="boot-checklist" id="boot-checklist"></div>
+    <div class="boot-progress-outer" id="boot-progress-outer">
+      <div class="boot-progress-inner" id="boot-progress-inner"></div>
+    </div>
+    <button class="boot-skip" id="boot-skip">SKIP</button>
+  </div>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-left">
+      <img src="logo.jpg" class="logo-icon" alt="MIXSCAN logo">
+      <div>
+        <div class="logo-title">MIXSCAN</div>
+        <div class="logo-sub" id="mode-info">PlutoSDR · 433.5 MHz</div>
+      </div>
+    </div>
+    <div class="mode-selector">
+      <button class="mode-btn active" id="btn-proto1">PROTO 1</button>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <button class="btn-load btn-live-stop" id="btn-live-stop" style="display:none;">
+        <span class="live-dot-pulse"></span> EN VIVO — DETENER
+      </button>
+      <button class="btn-load btn-ghost-danger" id="btn-clear-captures">
+        Eliminar Capturas
+      </button>
+      <div class="status-indicator">
+        <div class="status-dot"></div>
+        <span id="clock">--:--:--</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ALERT BANNER -->
+    <div class="alert-banner waiting" id="alert-banner">
+      <svg class="banner-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,12 5,12 7,5 10,19 13,7 16,12 19,12 22,12"/></svg>
+      <div class="alert-text">
+        <h2>ESPERANDO DATOS</h2>
+        <p>Inicia la detección en vivo para comenzar el análisis</p>
+      </div>
+    </div>
+
+    <!-- RADAR + MÉTRICAS -->
+    <div id="load-section">
+      <div class="load-splash">
+        <div class="radar-container">
+          <div class="radar-sweep"></div>
+          <div class="radar-ring r1"></div>
+          <div class="radar-ring r2"></div>
+          <div class="radar-cross"></div>
+          <div class="radar-dot" id="radar-dot"></div>
+        </div>
+        <div class="radar-scan-text">ESCANEANDO<span class="scan-cursor">_</span></div>
+        <div class="splash-cta-wrap" id="splash-cta-wrap">
+          <button class="btn-live-hero" id="btn-live-hero">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16">
+              <path d="M18.36 6.64a9 9 0 1 1-12.73 0"/>
+              <line x1="12" y1="2" x2="12" y2="12"/>
+            </svg>
+            INICIAR DETECCIÓN
+          </button>
+          <p class="splash-cta-hint">Conecta el PlutoSDR antes de iniciar</p>
+        </div>
+        <div class="splash-metrics">
+          <div class="splash-kpi">
+            <div class="splash-kpi-val" id="sk-capturas">—</div>
+            <div class="splash-kpi-label">CAPTURAS</div>
+          </div>
+          <div class="splash-kpi-divider"></div>
+          <div class="splash-kpi">
+            <div class="splash-kpi-val red" id="sk-alertas">—</div>
+            <div class="splash-kpi-label">DETECCIONES</div>
+          </div>
+          <div class="splash-kpi-divider"></div>
+          <div class="splash-kpi">
+            <div class="splash-kpi-val cyan" id="sk-uptime">—</div>
+            <div class="splash-kpi-label">TIEMPO DE ACTIVIDAD</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DASHBOARD (hidden until data loaded) -->
+    <div id="dashboard" class="hidden">
+
+      <!-- KPIs -->
+      <div class="section-title">RESUMEN DE ANÁLISIS</div>
+      <div class="kpi-grid">
+        <div class="kpi">
+          <div class="kpi-label">TOTAL CAPTURAS</div>
+          <div class="kpi-val" id="kpi-total">—</div>
+          <div class="kpi-sub">archivos analizados</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label" id="kpi-det-label">DRON DETECTADO</div>
+          <div class="kpi-val red" id="kpi-det">—</div>
+          <div class="kpi-sub">alertas activas</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label" id="kpi-clean-label">SIN DRON</div>
+          <div class="kpi-val green" id="kpi-clean">—</div>
+          <div class="kpi-sub">ambiente limpio</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label">Δ SNR MÁX</div>
+          <div class="kpi-val" id="kpi-snr-max">—</div>
+          <div class="kpi-sub">mayor separación</div>
+        </div>
+        <div class="kpi">
+          <div class="kpi-label" id="kpi-extra-label">COSENO PROM</div>
+          <div class="kpi-val" id="kpi-extra">—</div>
+          <div class="kpi-sub" id="kpi-extra-sub">similitud media</div>
+        </div>
+      </div>
+
+      <!-- CAPA 2 MAVLink STATUS -->
+      <div class="section-title" id="capa2-section-title">VERIFICACIÓN MAVLink — CAPA 2</div>
+      <div class="capa2-card" id="capa2-card">
+        <div class="capa2-row">
+          <div class="capa2-icon-wrap" id="capa2-icon-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
+              <polyline points="2,12 5,12 7,5 10,19 13,7 16,12 19,12 22,12"/>
+            </svg>
+          </div>
+          <div class="capa2-info">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="capa2-estado" id="capa2-estado">EN ESPERA</div>
+              <span id="capa2-armed" style="display:none"></span>
+            </div>
+            <div class="capa2-sub" id="capa2-sub">COM8 · SiK · 57,600 bd · MAVLink HEARTBEAT</div>
+          </div>
+          <div class="capa2-badge-wrap">
+            <div class="capa2-count-val" id="capa2-count">0</div>
+            <div class="capa2-count-label">confirmaciones</div>
+          </div>
+          <div class="capa2-last-wrap" id="capa2-last-wrap" style="display:none;">
+            <div class="capa2-snr" id="capa2-snr">— dB</div>
+            <div class="capa2-ts" id="capa2-ts">—</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHARTS -->
+      <div class="section-title">ANÁLISIS ESPECTRAL</div>
+      <div class="chart-card">
+        <div class="chart-title">Δ SNR por captura (dB)</div>
+        <div class="chart-wrap"><canvas id="chart-bar"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Mapa de Detección — Δ SNR vs Similitud Coseno</div>
+        <div class="chart-wrap"><canvas id="chart-scatter"></canvas></div>
+      </div>
+
+      <!-- TABLE -->
+      <div class="section-title">REGISTRO DE DETECCIONES</div>
+      <div class="log-card">
+        <div class="log-header">
+          <span>Resultados por archivo</span>
+          <div style="display:flex;align-items:center;gap:16px;">
+            <span id="last-update" style="display:none;font-size:.65rem;color:var(--text-dim);font-family:var(--font-mono);letter-spacing:.5px"></span>
+            <span id="log-count">0 registros</span>
+          </div>
+        </div>
+        <div class="log-wrap">
+          <table>
+            <thead id="log-thead">
+              <tr>
+                <th>Archivo</th><th>Resultado</th><th>Δ SNR</th>
+                <th>Coseno</th><th>Confianza</th><th>Timestamp</th>
+              </tr>
+            </thead>
+            <tbody id="log-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- /dashboard -->
+  </main>
+
+  <footer class="footer">
+    MIXSCAN· DETECTOR1 ·
+  </footer>
+
+  <!-- CONFIRM MODAL -->
+  <div class="confirm-overlay" id="confirm-overlay">
+    <div class="confirm-box">
+      <svg class="confirm-warn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+        <line x1="12" y1="9" x2="12" y2="13"/>
+        <line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+      <h3 class="confirm-title">ELIMINAR CAPTURAS</h3>
+      <p class="confirm-body">¿Eliminar todas las capturas en tiempo real y reiniciar los reportes? Esta acción no se puede deshacer.</p>
+      <div class="confirm-actions">
+        <button class="confirm-btn confirm-cancel-btn" id="confirm-cancel">CANCELAR</button>
+        <button class="confirm-btn confirm-ok-btn" id="confirm-ok">ELIMINAR TODO</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js?v=10"></script>
+</body>
+</html>
