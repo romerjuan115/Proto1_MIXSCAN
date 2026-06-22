@@ -1,8 +1,8 @@
-# MEXSCAN — Sistema de Detección de RPAS por RF
+# MIXSCAN — Sistema de Detección de RPAS por RF
 
-Sistema de detección de drones (RPAS) en la banda 433 MHz mediante análisis espectral
-en tiempo real. Combina captura SDR (Capa 1) con verificación del protocolo MAVLink vía
-enlace serie (Capa 2) para reducir falsos positivos.
+Sistema de detección de (RPAS) en la frecuencia 433 MHz mediante análisis espectral.
+Combina captura SDR (Capa 1) con verificación del protocolo MAVLink vía
+enlace serie (Capa 2).
 
 **Resultados de validación:** 60 % de detección a 3 m, 70 % a 6 m, 
 ---
@@ -142,12 +142,11 @@ votación (`VENTANA_VOTOS = 5`, `VOTOS_MINIMOS = 2`) mitiga este efecto.
 ├── detector.py               # ΔSNR, PSD, votacion, modo batch/interactivo
 ├── main.py                   # Orquestador Capa 1 + Capa 2
 ├── server.py                 # Dashboard FastAPI + WebSocket (puerto 8080)
-├── test.py / checar.py       # Utilidades de diagnostico
+├── test.py                   # Utilidades de diagnostico
 ├── capa2_mavlink/
 │   ├── capa2_serial.py       # Lectura MAVLink por puerto serie
-│   ├── mavlink_parser.py     # Parser MAVLink v1/v2 + CRC-16/MCRF4XX
-│   ├── logger.py             # Escritura CSV thread-safe de detecciones
-│   └── ataques.py            # Herramienta de investigacion ofensiva (ver nota abajo)
+│   ├── mavlink_parser.py     # Parser MAVLink v1/v2 
+│   ├── logger.py             # Escritura CSV 
 ├── gui/
 │   ├── index.html
 │   ├── app.js
