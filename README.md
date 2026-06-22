@@ -1,6 +1,6 @@
-# MIXSCAN — Sistema de Detección de RPAS por RF
+MIXSCAN — Prototipo de software para la detección de RPAS
 
-Sistema de detección de (RPAS) en la frecuencia 433 MHz mediante análisis espectral.
+Prototipo de detección de (RPAS) en la frecuencia 433 MHz mediante análisis espectral.
 Combina captura SDR (Capa 1) con verificación del protocolo MAVLink vía
 enlace serie (Capa 2).
 
