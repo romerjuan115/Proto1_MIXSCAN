@@ -27,7 +27,7 @@ enlace serie (Capa 2) para reducir falsos positivos.
 ### Requisitos previos
 - Python 3.11
 - Drivers PlutoSDR: libiio + plutosdr-m2k-drivers (instrucciones en la wiki oficial de Analog Devices)
-- Drivers SiK Radio: Silicon Labs CP210x (Windows los instala automáticamente en la mayoría de casos)
+- Drivers SiK Radio: Silicon Labs (Windows los instala automáticamente en la mayoría de casos)
 
 ### Pasos
 
@@ -114,17 +114,17 @@ main.py  (orquestador de hilos)
 
 **Verificación en Capa 2:**
 - Al activarse la alerta de Capa 1, el sistema lee el puerto serie del SiK Radio ground
-- Busca tramas MAVLink v1/v2 con CRC-16/MCRF4XX válido (HEARTBEAT, msg_id = 0)
-- Si encuentra HEARTBEAT con CRC ok → confirma dron activo y lo registra en `logs/detecciones.csv`
+- Busca tramas MAVLink v1/v2 (HEARTBEAT, msg_id = 0)
+- Si encuentra HEARTBEAT → confirma dron activo y lo registra en `logs/detecciones.csv`
 
 ---
 
 ## Resultados de validación
 
-| Sesión | Distancia | Detección Capa 1 | Falsos positivos |
+| Sesión | Distancia | Detección Capa 1 | 
 |---|---|---|---|
-| S2 | 3 m | 60 % | 0 / 30 capturas |
-| S3 | 6 m | 70 % | 0 / 30 capturas |
+| S2 | 3 m | 60 % |
+| S3 | 6 m | 70 % | 
 
 La tasa de detección inferior al 100 % se explica por el ciclo TDMA half-duplex del
 enlace SiK (~50 %), que genera gaps de 2-3 clips consecutivos sin señal. La ventana de
