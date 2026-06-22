@@ -4,9 +4,7 @@ Sistema de detección de drones (RPAS) en la banda 433 MHz mediante análisis es
 en tiempo real. Combina captura SDR (Capa 1) con verificación del protocolo MAVLink vía
 enlace serie (Capa 2) para reducir falsos positivos.
 
-**Resultados de validación:** 60 % de detección a 3 m, 70 % a 6 m, 0 falsos positivos
-en 30 capturas de ruido limpio.
-
+**Resultados de validación:** 60 % de detección a 3 m, 70 % a 6 m, 
 ---
 
 ## Hardware requerido
