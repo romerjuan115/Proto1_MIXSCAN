@@ -94,19 +94,6 @@ python server.py
 
 ---
 
-## Modo simulación (sin hardware)
-
-Para probar la lógica del sistema sin PlutoSDR ni SiK Radio:
-
-```powershell
-python simular_detecciones.py
-```
-
-Genera detecciones sintéticas en `resultados.csv` y `logs/detecciones.csv`, lo que
-permite verificar el dashboard y la lógica de correlación Capa 1 + Capa 2.
-
----
-
 ## Arquitectura
 
 ```
@@ -155,7 +142,6 @@ votación (`VENTANA_VOTOS = 5`, `VOTOS_MINIMOS = 2`) mitiga este efecto.
 ├── detector.py               # ΔSNR, PSD, votacion, modo batch/interactivo
 ├── main.py                   # Orquestador Capa 1 + Capa 2
 ├── server.py                 # Dashboard FastAPI + WebSocket (puerto 8080)
-├── simular_detecciones.py    # Simulador sin hardware
 ├── test.py / checar.py       # Utilidades de diagnostico
 ├── capa2_mavlink/
 │   ├── capa2_serial.py       # Lectura MAVLink por puerto serie
@@ -169,11 +155,6 @@ votación (`VENTANA_VOTOS = 5`, `VOTOS_MINIMOS = 2`) mitiga este efecto.
 ├── capturas/ruido/           # Clips de referencia — generados con captura_ruido.py, NO en git
 └── logs/detecciones.csv      # Registro de confirmaciones Capa 2
 ```
-
-> `capa2_mavlink/ataques.py` es una herramienta de investigacion desarrollada para
-> caracterizar la superficie de ataque del protocolo MAVLink. No forma parte del sistema
-> de deteccion y no debe usarse fuera de entornos de laboratorio controlados.
-
 ---
 
 ## Notas para reproducibilidad
