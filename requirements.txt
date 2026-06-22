@@ -1,0 +1,9 @@
+# Python 3.11
+numpy
+scipy
+matplotlib
+fastapi
+uvicorn[standard]
+pyadi-iio
+pyserial
+soundfile
