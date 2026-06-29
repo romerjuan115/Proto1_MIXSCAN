@@ -21,7 +21,7 @@ import winsound
 from pathlib import Path
 from datetime import datetime
 
-# Windows usa cp1252 por defecto; sin esto los emojis de alerta (🚨) se corrompen en consola.
+
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 if hasattr(sys.stderr, "reconfigure"):
